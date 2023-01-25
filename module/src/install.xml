@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+<insertfile>_inc/summary.txt</insertfile>
+-->
+
+<modification>
+    <name>#ocmod.space: <insertvar>MODCODE</insertvar></name>
+    <code><insertvar>MODFILE</insertvar></code>
+    <version><insertvar>MODVERS</insertvar></version>
+    <author><insertvar>AUTHOR</insertvar></author>
+    <link><insertvar>XMLLINK</insertvar></link>
+
+    <file error="log" path="admin/model/catalog/product.php">
+        <operation error="log">
+            <search>
+                <![CDATA[$sql = "SELECT COUNT(DISTINCT p.product_id) AS total FROM " . DB_PREFIX . "product p LEFT JOIN " . DB_PREFIX . "product_description pd ON (p.product_id = pd.product_id)";]]>
+            </search>
+            <add position="after">
+                <![CDATA[
+		/// << Filter By Category
+		if (!empty($data['filter_category_id'])) {
+			$sql .= " LEFT JOIN " . DB_PREFIX . "product_to_category p2c ON (p.product_id = p2c.product_id)";
+		}
+		/// >> Filter By Category]]>
+            </add>
+        </operation>
+
+        <operation error="log">
+            <search>
+                <![CDATA[$sql = "SELECT * FROM " . DB_PREFIX . "product p LEFT JOIN " . DB_PREFIX . "product_description pd ON (p.product_id = pd.product_id) WHERE pd.language_id = '" . (int)$this->config->get('config_language_id') . "'";]]>
+            </search>
+            <add position="replace">
+                <![CDATA[/// << Filter By Category
+		$sql = "SELECT p.*,pd.* FROM " . DB_PREFIX . "product p LEFT JOIN " . DB_PREFIX . "product_description pd ON (p.product_id = pd.product_id)";
+		$sql .= " LEFT JOIN " . DB_PREFIX . "product_to_category p2c ON (p.product_id = p2c.product_id)";
+		$sql .= " WHERE pd.language_id = '" . (int)$this->config->get('config_language_id') . "'";
+		/// >> Filter By Category]]>
+            </add>
+        </operation>
+
+        <operation error="log">
+            <search>
+                <![CDATA[if (!empty($data['filter_name'])) {]]>
+            </search>
+            <add position="before">
+                <![CDATA[
+		/// << Filter By Category
+		if (!empty($data['filter_category_id'])) {
+			$sql .= " AND p2c.category_id = '" . (int)$data['filter_category_id'] . "%'";
+		}
+		/// >> Filter By Category]]>
+            </add>
+        </operation>
+
+        <operation error="log" info="Sort each product categories by name">
+            <search>
+                <![CDATA[$query = $this->db->query("SELECT * FROM " . DB_PREFIX . "product_to_category WHERE product_id = '" . (int)$product_id . "'");]]>
+            </search>
+            <add position="replace">
+                <![CDATA[/// << Filter By Category
+		$sql = "SELECT p2c.* FROM " . DB_PREFIX . "product_to_category AS p2c";
+		$sql .= " JOIN " . DB_PREFIX . "category_description AS cd ON cd.category_id = p2c.category_id";
+		// $sql .= " WHERE product_id = '" . (int)$product_id . "'";
+		$sql .= " WHERE product_id = '" . (int)$product_id . "' AND cd.language_id = '" . (int)$this->config->get('config_language_id') . "'";
+		$sql .= " ORDER BY cd.name";
+
+		$query = $this->db->query($sql);
+		/// >> Filter By Category]]>
+            </add>
+        </operation>
+        <operation error="log">
+            <search>
+                <![CDATA[$sql .= " GROUP BY p.product_id";]]>
+            </search>
+            <add position="before">
+            <![CDATA[
+		/// << Filter By Category
+		if (!empty($data['filter_category_id'])) {
+			if (!empty($data['filter_sub_category'])) {
+				$implode_data = array();
+				$implode_data[] = "category_id = '" . (int)$data['filter_category_id'] . "'";
+
+				$this->load->model('catalog/category');
+
+				$categories = $this->model_catalog_category->getCategories($data['filter_category_id']);
+
+				foreach ($categories as $category) {
+					$implode_data[] = "p2c.category_id = '" . (int)$category['category_id'] . "%'";
+				}
+
+				$sql .= " AND (" . implode(' OR ', $implode_data) . ")";
+			} else {
+				$sql .= " AND p2c.category_id = '" . (int)$data['filter_category_id'] . "%'";
+			}
+		}
+		/// >> Filter By Category]]>
+            </add>
+        </operation>
+    </file>
+
+    <file error="log" path="admin/controller/catalog/product.php">
+        <operation error="log">
+            <search>
+                <![CDATA[$url = '';]]>
+            </search>
+            <add position="after">
+                <![CDATA[
+			/// << Filter By Category
+			if (isset($this->request->get['filter_category_id'])) {
+				$url .= '&filter_category_id=' . $this->request->get['filter_category_id'];
+			}
+			/// >> Filter By Category]]>
+            </add>
+        </operation>
+
+        <operation error="log">
+            <search>
+                <![CDATA[protected function getList() {]]>
+            </search>
+            <add position="after">
+                <![CDATA[
+		/// << Filter By Category
+		if (isset($this->request->get['filter_category_id'])) {
+			$filter_category_id = $this->request->get['filter_category_id'];
+		} else {
+			$filter_category_id = '';
+		}
+		/// >> Filter By Category]]>
+            </add>
+        </operation>
+
+        <operation error="log">
+            <search>
+                <![CDATA['filter_quantity' => $filter_quantity,]]>
+            </search>
+            <add position="before">
+                <![CDATA[			'filter_category_id' => $filter_category_id,  /// Filter By Category]]>
+            </add>
+        </operation>
+
+        <operation error="log">
+            <search>
+                <![CDATA[$product_total = $this->model_catalog_product->getTotalProducts($filter_data);]]>
+            </search>
+            <add position="after">
+                <![CDATA[
+		/// << Filter By Category
+		$this->load->model('catalog/category');
+		$data['categories'] = $this->model_catalog_category->getCategories(['sort' => 'name', 'order' => 'ASC',]);
+		/// >> Filter By Category]]>
+            </add>
+        </operation>
+
+        <operation error="log">
+            <search>
+                <![CDATA[$data['products'][] = array(]]>
+            </search>
+            <add position="before">
+                <![CDATA[
+			/// << Filter By Category
+			$category =  $this->model_catalog_product->getProductCategories($result['product_id']);
+			/// >> Filter By Category]]>
+            </add>
+        </operation>
+
+        <operation error="log">
+            <search>
+                <![CDATA['name'       => $result['name'],]]>
+            </search>
+            <add position="before">
+                <![CDATA[				'category'   => $category,  /// Filter By Category]]>
+            </add>
+        </operation>
+
+        <operation error="log">
+            <search>
+                <![CDATA[$data['filter_name'] = $filter_name;]]>
+            </search>
+            <add position="before">
+                <![CDATA[		$data['filter_category_id'] = $filter_category_id;  /// Filter By Category]]></add>
+        </operation>
+    </file>
+
+    <file error="log" path="admin/view/template/catalog/product_list.twig">
+        <operation error="log">
+            <search>
+                <![CDATA[var filter_quantity]]>
+            </search>
+            <add position="before">
+                <![CDATA[            <!-- Filter by Category -->
+            var filter_category_id = $('select[name=\'filter_category_id\']').val();
+
+            if (filter_category_id != '*') {
+                url += '&filter_category_id=' + encodeURIComponent(filter_category_id);
+            }
+            ]]></add>
+        </operation>
+
+        <operation error="log">
+            <search>
+                <![CDATA[<td class="text-right">{% if sort == 'p.quantity' %}]]>
+            </search>
+            <add position="before">
+                <![CDATA[                      <td class="text-left">{{ entry_category }}</td>]]>
+            </add>
+        </operation>
+
+        <operation error="log">
+            <search>
+                <![CDATA[<td class="text-right">{% if product.quantity <= 0 %}]]>
+            </search>
+            <add position="before">
+            <![CDATA[                    <td class="text-left">{% for category in categories %}{% if category.category_id in product.category %}{{ category.name }}<br>{% endif %}{% endfor %}</td>]]>
+            </add>
+        </operation>
+
+        <operation error="log">
+            <search index="0">
+                <![CDATA[<div class="form-group">]]>
+            </search>
+            <add position="before">
+                <![CDATA[
+            <!-- Filter by Category -->
+            <div class="form-group">
+                <label class="control-label" for="select-category">{{ entry_category }}</label>
+                <select name="filter_category_id" id="select-category" class="form-control" >
+                    <option value="*"></option>
+                    {% for category in categories %}
+                        {% if category.category_id == filter_category_id %}
+                            <option value="{{ category.category_id }}" selected="selected">{{ category.name }}</option>
+                        {% else %}
+                            <option value="{{ category.category_id }}">{{ category.name }}</option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
+            </div>]]>
+            </add>
+        </operation>
+    </file>
+
+</modification>
