@@ -1,7 +1,7 @@
 # Filter By Category
 
 ## Description
-Filter By Category extension allows to filter the product list in admin by categories.  
+**Filter By Category** extension allows to filter the product list in admin by categories.  
 Compatible with OpenCart 3.x.
 
 ## Download
