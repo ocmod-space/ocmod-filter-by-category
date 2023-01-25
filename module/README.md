@@ -13,4 +13,4 @@ Compatible with OpenCart 3.x.
 [MIT License](https://raw.githubusercontent.com/ocmod-space/ocmod-filter-by-category/main/LICENSE.txt)
 
 ## Download
-[OpenCart Marketplace](https://www.opencart.com/index.php?route=marketplace/extension&filter_member=ocmod.space)
+[OpenCart Marketplace](https://www.opencart.com/index.php?route=marketplace/extension/info&extension_id=34415)

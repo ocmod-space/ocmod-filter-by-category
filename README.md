@@ -5,4 +5,4 @@
 Compatible with OpenCart 3.x.
 
 ## Download
-[OpenCart Marketplace](https://www.opencart.com/index.php?route=marketplace/extension&filter_member=ocmod.space)
+[OpenCart Marketplace](https://www.opencart.com/index.php?route=marketplace/extension/info&extension_id=34415)
