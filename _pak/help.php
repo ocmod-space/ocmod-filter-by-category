@@ -2,14 +2,13 @@
 
 // just help
 
-out('PAK - OpenCart Extension Packer v0.4.0');
-out('Using: php pakrun.php [-option]');
-out();
-out('Options:');
-out(' -z[N]' . "\t" . 'Zip extension files.');
-out("\t" . 'N - number of module to create zip (see list below).');
-out(' -h' . "\t" . 'Print this help.');
-out(' -m' . "\t" . 'Make encrypted fcl-archive.');
-out(' -e' . "\t" . 'Extract encrypted fcl-archive into current directory.');
-out(' -l' . "\t" . 'List of files in encrypted fcl-archive.');
-out();
+output('PAK - OpenCart Extension Packer v0.4.2');
+output('Using: php pakrun.php [-option]');
+output();
+output('Options:');
+output(' -z[N]'."\t\t".'Zip extension files. [N] - the number corresponding to an addon or module directory to create zip (see list below).');
+output(' -h'."\t\t".'Print this help.');
+output(' -a'."\t\t".'Make encrypted fcl-archive.');
+output(' -x'."\t\t".'Extract encrypted fcl-archive into current directory.');
+output(' -l'."\t\t".'List of files in encrypted fcl-archive.');
+output();

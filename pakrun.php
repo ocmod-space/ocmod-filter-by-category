@@ -1,6 +1,6 @@
 <?php
 
-// PAK - OpenCart Extension Packer v0.4.0
+// PAK - OpenCart Extension Packer v0.4.3
 
 require_once '_pak/conf.php';
 
@@ -21,24 +21,25 @@ set_error_handler(function ($errno, $errstr, $errfile, $errline) {
 
 $clo = get_clo();
 $basename = strtolower(basename(getcwd()));
-
-if (isset($clo[MAKEZIP]) && !is_false($clo[MAKEZIP])) {
+if (isset($clo[MAKEZIP]) && $clo[MAKEZIP] !== false) {
     require_once 'pakdef.php';
 
-    $workdir = get_wd($clo[MAKEZIP]);
+    $workdir = getWd($clo[MAKEZIP]);
 
     if ($workdir) {
-        $srcdir = strtopath(strtopath($workdir) . SRCDIR);
-        $zipdir = strtopath(strtopath($workdir) . ZIPDIR);
+        $srcdir = getConcatPath($workdir, SRCDIR);
+        $zipdir = getConcatPath($workdir, ZIPDIR);
 
-        if (strpos($workdir, strtopath(ADIR)) === 0) {
-            $basename .= str_replace(strtopath(ADIR), '--', $workdir);
+        if (strpos($workdir, ADIR) === 0) {
+            $part = explode(DIRECTORY_SEPARATOR, $workdir);
+            $basename .= '--'.end($part);
+
+            unset($part);
         }
 
         define('MODFILE', $basename);
 
-        $zipfile = $basename;
-        $zipfile = $zipdir . $zipfile . ZIPEXT;
+        $zipfile = getConcatPath($zipdir, $basename.ZIPEXT);
 
         $mod_code = str_replace('--', '|', $basename);
 
@@ -59,49 +60,49 @@ if (isset($clo[MAKEZIP]) && !is_false($clo[MAKEZIP])) {
 
             mkzip($srcdir, $zipfile, true);
         } else {
-            error('Can not create dir: ' . $zipdir);
+            output('Can not create dir: '.$zipdir, true);
         }
     } else {
-        error('There is no directory corresponding to number ' . $clo[MAKEZIP]);
+        output('There is no directory corresponding to number '.$clo[MAKEZIP], true);
     }
 } elseif (isset($clo[MAKEFCL]) || isset($clo[EXTRFCL]) || isset($clo[LISTFCL])) {
-    $fcl_file = strtopath(FCLDIR) . $basename . '.fcl';
+    $fclfile = getConcatPath(FCLDIR, $basename.'.fcl');
 
     if (isset($clo[MAKEFCL])) {
         chkdir(FCLDIR);
 
-        out(runfcl('make', $fcl_file, '-f' . get_fclignore(FCLIGNORE)));
-        out(runhideg($fcl_file));
+        output(fcl('make', $fclfile, '-f'.fclignore(FCLIGNORE)));
+        output(hideg($fclfile));
     } elseif (isset($clo[EXTRFCL]) || isset($clo[LISTFCL])) {
-        if (is_file($fcl_file . '.g')) {
-            out(runhideg($fcl_file . '.g'));
+        if (is_file($fclfile.'.g')) {
+            output(hideg($fclfile.'.g'));
 
-            if (is_file($fcl_file)) {
+            if (is_file($fclfile)) {
                 if (isset($clo[EXTRFCL])) {
-                    out(runfcl('extr', $fcl_file, '-f'));
+                    output(fcl('extr', $fclfile, '-f'));
                 }
 
                 if (isset($clo[LISTFCL])) {
-                    out(runfcl('list', $fcl_file));
+                    output(fcl('list', $fclfile));
                 }
             } else {
-                error('file "' . $fcl_file . '" is missing!');
+                output('file "'.$fclfile.'" is missing!', true);
             }
         } else {
-            error('file "' . $fcl_file . '.g' . '" is missing!');
+            output('file "'.$fclfile.'.g'.'" is missing!', true);
         }
     }
 
-    if (is_file($fcl_file)) {
-        unlink($fcl_file);
+    if (is_file($fclfile)) {
+        unlink($fclfile);
     }
 } else {
     include '_pak/help.php';
 
-    out('Numbers:');
+    output('Numbers:');
 
-    foreach (get_enumerated() as $idx => $name) {
-        out('[' . $idx . '] - ' . $name);
+    foreach (numbered() as $idx => $name) {
+        output('['.$idx.'] - '.$name);
     }
 }
 
