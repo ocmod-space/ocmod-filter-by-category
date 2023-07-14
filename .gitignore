@@ -1,5 +1,9 @@
 _inc
+doc
 pic
-*.bb
+src
+zip
+*.code-workspace
+*.fclignore
 *.pwd
 pakdef.php
