@@ -10,7 +10,11 @@ Compatible with OpenCart 3.x.
 * Does not modify system files (OCMOD).
 
 ## License
-Licensed under the [MIT License](https://raw.githubusercontent.com/ocmod-space/ocmod-filter-by-category/main/LICENSE.txt)
+Licensed under the [MIT License](https://raw.githubusercontent.com/ocmod-space/ocmod-filter-by-category/main/LICENSE.txt).
 
-## Download
-[OpenCart Marketplace](https://www.opencart.com/index.php?route=marketplace/extension/info&extension_id=34415)
+## Related extensions
+* [**Admin Filter**](https://www.opencart.com/index.php?route=marketplace/extension/info&extension_id=36080) - advanced version with a bunch of features.
+
+## Links
+* **Filter By Category** on [**OpenCart Marketplace**](https://www.opencart.com/index.php?route=marketplace/extension/info&extension_id=34415).
+* [**Filter By Category**](https://www.ocmod.space/filter-by-category) web page.
