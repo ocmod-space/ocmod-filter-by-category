@@ -17,7 +17,7 @@ return $config
 		// Each element of an array must be indented exactly once.
 		'array_indentation' => true,
 		// PHP arrays should be declared using the configured syntax.
-		'array_syntax' => array('syntax' => 'short'),
+		'array_syntax' => array('syntax' => 'long'),
 		// Converts backtick operators to `shell_exec` calls.
 		'backtick_to_shell_exec' => true,
 		// Binary operators should be surrounded by space as configured.
@@ -338,4 +338,3 @@ return $config
 			->in(__DIR__)
 	)
 ;
-?>
