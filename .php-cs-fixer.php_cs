@@ -24,7 +24,7 @@ return $config
 		'binary_operator_spaces' => array(
 			'default'   => 'single_space',
 			'operators' => array(
-				'=>' => 'align_single_space_minimal',
+				'=>' => 'align_single_space_minimal_by_scope',
 				'='  => 'single_space',
 			),
 		),
